@@ -49,7 +49,7 @@ var Sounds = {
     },
 
     getPath: function(filename) {
-        return "/public/sounds/" + filename + ".wav";
+        return Utils.path("sounds/" + filename + ".wav");
     }                
 };
 
@@ -86,11 +86,15 @@ var Bits = {
     },
 
     getPath: function(bit) {
-        return "/public/img/bits/" + bit + ".png";
+        return Utils.path("img/bits/" + bit + ".png");
     }
 };
 
 var Utils = {
+	path: function(path) {
+		return "public/" + path;
+	},
+
     positionFrom: function(pointer) {
         return new Phaser.Point(pointer.pageX, pointer.pageY);
     }
