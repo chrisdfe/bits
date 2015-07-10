@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Bits</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+        <link rel="stylesheet" href="public/css/main.css">
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <script src="public/vendor/jquery/dist/jquery.js"></script>
+        <script src="public/vendor/lodash/lodash.js"></script>
+        <script src="public/vendor/phaser/build/phaser.js"></script>
+
+        <script src="public/js/main.js"></script>
+
+        <script>
+            var settings = {
+                bitsLength : 19,
+                bitScale   : 0.7
+            };
+
+            var activeBits = [];
+
+            var soundFiles = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "14", "15", "16", "21", "25", "27"];
+            var sounds = [];
+
+            var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.AUTO, "", {
+                preload: preload,
+                create: create,
+            });
+
+            function preload() {
+                initImages();
+                initSounds();
+            }
+
+            function initImages() {
+                for (var i = 1; i <= settings.bitsLength; i++) {
+                    game.load.image(bitName(i), bitsPath(i));
+                }
+            }
+
+            function initSounds() {
+                var file, sound;
+                for (var i = 0; i < soundFiles.length; i++) {
+                    file = soundFiles[i]
+                    game.load.audio(soundName(file), soundPath(file));
+                    sound = game.add.audio(soundName(file));
+                    sounds.push(sound);
+                }
+            }
+
+            function create() {
+                game.input.onDown.add(click);
+                game.stage.backgroundColor = "#f0ff84";
+                game.physics.startSystem(Phaser.Physics.P2JS);
+                game.physics.p2.gravity.y = 400;
+                game.physics.p2.restitution = 0.8;
+            }
+
+            function click(pointer) {
+                spawnBit(positionFrom(pointer));
+                playRandomSound();
+            }
+
+            function playRandomSound() {
+                randomSound().play();
+            }
+
+            function randomSound() {
+                var index = Math.floor(Math.random() * sounds.length);
+                return sounds[index];
+            }
+
+            function soundName(filename) {
+                return "sound_" + filename;
+            }
+
+            function soundPath(filename) {
+                return "/public/sounds/" + filename + ".wav";
+            }
+
+            function spawnBit(position) {
+                var bit = game.add.sprite(position.x, position.y, randomBit());
+                bit.scale = new Phaser.Point(settings.bitScale, settings.bitScale);
+                bit.position = position;
+                game.physics.p2.enable(bit);
+            }
+
+            function randomBit() {
+                var index = 1 + Math.floor(Math.random() * (settings.bitsLength - 1));
+                return bitName(index);
+            }
+
+            function bitName(bit) {
+                return "bit_" + bit;
+            }
+
+            function bitsPath(bit) {
+                return "/public/img/bits/" + bit + ".png";
+            }
+
+            function positionFrom(pointer) {
+                return new Phaser.Point(pointer.pageX, pointer.pageY);
+            }
+        </script>
+    </body>
+</html>
